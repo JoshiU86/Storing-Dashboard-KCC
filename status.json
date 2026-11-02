@@ -1,0 +1,44 @@
+{
+  "internet": {
+    "status": "green",
+    "gemeldBij": "",
+    "door": "",
+    "melding": "",
+    "update": ""
+  },
+  "nimble": {
+    "status": "green",
+    "gemeldBij": "",
+    "door": "",
+    "melding": "",
+    "update": ""
+  },
+  "autoline": {
+    "status": "green",
+    "gemeldBij": "",
+    "door": "",
+    "melding": "",
+    "update": ""
+  },
+  "mobo": {
+    "status": "green",
+    "gemeldBij": "",
+    "door": "",
+    "melding": "",
+    "update": ""
+  },
+  "planner": {
+    "status": "green",
+    "gemeldBij": "",
+    "door": "",
+    "melding": "",
+    "update": ""
+  },
+  "awp": {
+    "status": "green",
+    "gemeldBij": "",
+    "door": "",
+    "melding": "",
+    "update": ""
+  }
+}
