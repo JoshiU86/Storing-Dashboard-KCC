@@ -1,26 +1,8 @@
 {
-  "internet": {
-    "status": "green",
-    "melding": "none"
-  },
-  "nimble": {
-    "status": "green",
-    "melding": "none"
-  },
-  "autoline": {
-    "status": "orange",
-    "melding": "it"
-  },
-  "mobo": {
-    "status": "green",
-    "melding": "none"
-  },
-  "planner": {
-    "status": "green",
-    "melding": "none"
-  },
-  "awp": {
-    "status": "red",
-    "melding": "leverancier"
-  }
+  "internet": {},
+  "nimble": {},
+  "autoline": {},
+  "mobo": {},
+  "planner": {},
+  "awp": {}
 }
