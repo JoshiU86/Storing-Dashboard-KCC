@@ -36,9 +36,25 @@ body{
     margin-bottom:15px;
 }
 
+.header-right{
+    display:flex;
+    gap:10px;
+    align-items:center;
+}
+
 .title{
     font-size:48px;
     font-weight:700;
+}
+
+#beheerBtn{
+    width:60px;
+    height:60px;
+    border:none;
+    border-radius:12px;
+    background:white;
+    font-size:28px;
+    cursor:pointer;
 }
 
 .refresh{
@@ -67,8 +83,8 @@ body{
 }
 
 .summary-card{
-    width:200px;
-    height:75px;
+    width:220px;
+    height:80px;
     background:white;
     color:black;
     border-radius:12px;
@@ -89,7 +105,7 @@ body{
     background:white;
     border-radius:20px;
     padding:20px;
-    min-height:360px;
+    min-height:420px;
     display:flex;
     flex-direction:column;
     align-items:center;
@@ -97,13 +113,13 @@ body{
 
 .system{
     color:var(--blue);
-    font-size:38px;
+    font-size:42px;
     font-weight:700;
 }
 
 .light{
-    width:140px;
-    height:140px;
+    width:150px;
+    height:150px;
     border-radius:50%;
     margin:18px 0;
 }
@@ -124,22 +140,14 @@ body{
 }
 
 .status{
-    font-size:34px;
+    font-size:38px;
     font-weight:800;
     margin-bottom:20px;
 }
 
-.online{
-    color:var(--green);
-}
-
-.warning{
-    color:var(--orange);
-}
-
-.offline{
-    color:var(--red);
-}
+.online{color:var(--green);}
+.warning{color:var(--orange);}
+.offline{color:var(--red);}
 
 .reported{
     margin-top:auto;
@@ -169,16 +177,73 @@ body{
     color:#cbd5e1;
     font-size:14px;
 }
+
+/* Modal */
+
+.modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.75);
+    justify-content:center;
+    align-items:center;
+    z-index:9999;
+}
+
+.modal-box{
+    background:white;
+    color:black;
+    width:500px;
+    border-radius:20px;
+    padding:25px;
+}
+
+.modal-box h2{
+    margin-bottom:15px;
+}
+
+.modal-box label{
+    display:block;
+    margin-top:15px;
+    margin-bottom:5px;
+}
+
+.modal-box select{
+    width:100%;
+    padding:12px;
+}
+
+.modal-buttons{
+    display:flex;
+    gap:10px;
+    margin-top:20px;
+}
+
+.modal-buttons button{
+    padding:12px 20px;
+    cursor:pointer;
+}
 </style>
 </head>
+
 <body>
 
 <div class="header">
-    <div class="title">KCC SYSTEEMSTATUS</div>
 
-    <div class="refresh" id="refreshTime">
-        Laden...
+    <div class="title">
+        KCC SYSTEEMSTATUS
     </div>
+
+    <div class="header-right">
+
+        <button id="beheerBtn">⚙️</button>
+
+        <div class="refresh" id="refreshTime">
+            Laden...
+        </div>
+
+    </div>
+
 </div>
 
 <div class="banner" id="banner"></div>
@@ -195,7 +260,60 @@ body{
     Automatische verversing elke 30 seconden
 </div>
 
+<!-- Modal -->
+
+<div class="modal" id="beheerModal">
+
+    <div class="modal-box">
+
+        <h2>Status wijzigen</h2>
+
+        <label>Systeem</label>
+
+        <select id="systeemSelect">
+            <option value="internet">Internet</option>
+            <option value="nimble">Nimble</option>
+            <option value="autoline">Autoline</option>
+            <option value="mobo">Mobo</option>
+            <option value="planner">KCC Planner</option>
+            <option value="awp">AWP</option>
+        </select>
+
+        <label>Status</label>
+
+        <select id="statusSelect">
+            <option value="green">🟢 Online</option>
+            <option value="orange">🟠 Instabiel</option>
+            <option value="red">🔴 Offline</option>
+        </select>
+
+        <label>Gemeld bij</label>
+
+        <select id="meldingSelect">
+            <option value="none">Niet gemeld</option>
+            <option value="it">IT</option>
+            <option value="leverancier">Leverancier</option>
+        </select>
+
+        <div class="modal-buttons">
+
+            <button onclick="downloadStatus()">
+                📥 Download status.json
+            </button>
+
+            <button onclick="sluitModal()">
+                Sluiten
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
 <script>
+
+let huidigeData = {};
 
 function naam(key){
 
@@ -239,6 +357,8 @@ async function laadDashboard(){
     const data =
         await response.json();
 
+    huidigeData = data;
+
     const dashboard =
         document.getElementById(
             "dashboard"
@@ -265,75 +385,124 @@ async function laadDashboard(){
         }
 
         dashboard.innerHTML += `
-            <div class="card">
+        <div class="card">
 
-                <div class="system">
-                    ${naam(systeem)}
+            <div class="system">
+                ${naam(systeem)}
+            </div>
+
+            <div class="light ${item.status}">
+            </div>
+
+            <div class="status ${statusClass(item.status)}">
+                ${statusTekst(item.status)}
+            </div>
+
+            <div class="reported">
+
+                <div class="reported-title">
+                    GEMELD BIJ
                 </div>
 
-                <div class="light ${item.status}">
-                </div>
-
-                <div class="status ${statusClass(item.status)}">
-                    ${statusTekst(item.status)}
-                </div>
-
-                <div class="reported">
-                    <div class="reported-title">
-                        GEMELD BIJ
-                    </div>
-
-                    <div class="reported-value">
-                        ${meldingTekst(item.melding)}
-                    </div>
+                <div class="reported-value">
+                    ${meldingTekst(item.melding)}
                 </div>
 
             </div>
-        `;
+
+        </div>`;
     });
 
-    document.getElementById(
-        "onlineTotal"
-    ).innerHTML =
-    `🟢 ${online}`;
+    document.getElementById("onlineTotal").innerHTML =
+        `🟢 ${online}`;
 
-    document.getElementById(
-        "warningTotal"
-    ).innerHTML =
-    `🟠 ${warning}`;
+    document.getElementById("warningTotal").innerHTML =
+        `🟠 ${warning}`;
 
-    document.getElementById(
-        "offlineTotal"
-    ).innerHTML =
-    `🔴 ${offline}`;
+    document.getElementById("offlineTotal").innerHTML =
+        `🔴 ${offline}`;
 
     const banner =
-        document.getElementById(
-            "banner"
-        );
+        document.getElementById("banner");
 
     if(storingen.length > 0){
 
-        banner.style.display =
-            "block";
+        banner.style.display = "block";
 
         banner.innerHTML =
-            "🔴 ACTIEVE STORING: "
-            +
+            "🔴 ACTIEVE STORING: " +
             storingen.join(", ");
 
     }else{
 
-        banner.style.display =
-            "none";
+        banner.style.display = "none";
     }
 
-    document.getElementById(
-        "refreshTime"
-    ).innerHTML =
-    "Laatste controle: "
-    +
-    new Date().toLocaleString("nl-NL");
+    document.getElementById("refreshTime").innerHTML =
+        "Laatste controle: " +
+        new Date().toLocaleString("nl-NL");
+}
+
+document
+.getElementById("beheerBtn")
+.addEventListener("click",()=>{
+
+    document
+    .getElementById("beheerModal")
+    .style.display = "flex";
+});
+
+function sluitModal(){
+
+    document
+    .getElementById("beheerModal")
+    .style.display = "none";
+}
+
+function downloadStatus(){
+
+    const systeem =
+        document.getElementById(
+            "systeemSelect"
+        ).value;
+
+    huidigeData[systeem] = {
+
+        status:
+        document.getElementById(
+            "statusSelect"
+        ).value,
+
+        melding:
+        document.getElementById(
+            "meldingSelect"
+        ).value
+    };
+
+    const blob =
+    new Blob(
+        [
+            JSON.stringify(
+                huidigeData,
+                null,
+                2
+            )
+        ],
+        {
+            type:"application/json"
+        }
+    );
+
+    const a =
+    document.createElement("a");
+
+    a.href =
+    URL.createObjectURL(blob);
+
+    a.download =
+    "status.json";
+
+    a.click();
 }
 
 laadDashboard();
