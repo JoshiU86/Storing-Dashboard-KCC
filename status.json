@@ -1,44 +1,26 @@
 {
   "internet": {
     "status": "green",
-    "gemeldBij": "",
-    "door": "",
-    "melding": "",
-    "update": ""
+    "melding": "none"
   },
   "nimble": {
     "status": "green",
-    "gemeldBij": "",
-    "door": "",
-    "melding": "",
-    "update": ""
+    "melding": "none"
   },
   "autoline": {
-    "status": "green",
-    "gemeldBij": "",
-    "door": "",
-    "melding": "",
-    "update": ""
+    "status": "orange",
+    "melding": "it"
   },
   "mobo": {
     "status": "green",
-    "gemeldBij": "",
-    "door": "",
-    "melding": "",
-    "update": ""
+    "melding": "none"
   },
   "planner": {
     "status": "green",
-    "gemeldBij": "",
-    "door": "",
-    "melding": "",
-    "update": ""
+    "melding": "none"
   },
   "awp": {
-    "status": "green",
-    "gemeldBij": "",
-    "door": "",
-    "melding": "",
-    "update": ""
+    "status": "red",
+    "melding": "leverancier"
   }
 }

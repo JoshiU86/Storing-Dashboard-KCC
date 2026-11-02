@@ -11,7 +11,8 @@
     --green:#22c55e;
     --orange:#f59e0b;
     --red:#ef4444;
-    --bg:#0f172a;
+    --dark:#0f172a;
+    --dark2:#1e293b;
     --blue:#003B5C;
 }
 
@@ -19,11 +20,11 @@
     margin:0;
     padding:0;
     box-sizing:border-box;
-    font-family:Segoe UI,sans-serif;
+    font-family:"Segoe UI",sans-serif;
 }
 
 body{
-    background:linear-gradient(135deg,#0f172a,#1e293b);
+    background:linear-gradient(135deg,var(--dark),var(--dark2));
     color:white;
     min-height:100vh;
     padding:20px;
@@ -39,14 +40,25 @@ body{
 .title{
     font-size:48px;
     font-weight:700;
-    cursor:pointer;
 }
 
-.last-update{
+.refresh{
     background:rgba(255,255,255,.1);
-    padding:15px 25px;
+    padding:12px 20px;
     border-radius:12px;
-    font-size:20px;
+    font-size:18px;
+}
+
+.banner{
+    display:none;
+    background:#dc2626;
+    color:white;
+    font-size:28px;
+    font-weight:bold;
+    text-align:center;
+    padding:16px;
+    border-radius:16px;
+    margin-bottom:20px;
 }
 
 .summary{
@@ -59,19 +71,10 @@ body{
 .summary-card{
     background:white;
     color:black;
-    padding:15px 25px;
-    border-radius:15px;
-    font-size:24px;
-    font-weight:bold;
-}
-
-.alert-banner{
-    display:none;
-    background:#dc2626;
-    padding:15px;
+    padding:15px 30px;
+    border-radius:14px;
+    min-width:220px;
     text-align:center;
-    border-radius:15px;
-    margin-bottom:20px;
     font-size:28px;
     font-weight:bold;
 }
@@ -86,123 +89,77 @@ body{
     background:white;
     color:black;
     border-radius:20px;
-    padding:16px;
-    min-height:330px;
-    cursor:pointer;
+    padding:20px;
+    height:350px;
 }
 
 .system{
     text-align:center;
     font-size:34px;
     font-weight:700;
-    color:#003B5C;
+    color:var(--blue);
 }
 
 .light{
-    width:140px;
-    height:140px;
+    width:160px;
+    height:160px;
     border-radius:50%;
     margin:15px auto;
 }
 
 .green{
-    background:#22c55e;
-    box-shadow:0 0 40px #22c55e;
+    background:var(--green);
+    box-shadow:0 0 40px var(--green);
 }
 
 .orange{
-    background:#f59e0b;
-    box-shadow:0 0 40px #f59e0b;
+    background:var(--orange);
+    box-shadow:0 0 40px var(--orange);
 }
 
 .red{
-    background:#ef4444;
-    box-shadow:0 0 40px #ef4444;
+    background:var(--red);
+    box-shadow:0 0 40px var(--red);
 }
 
 .status{
     text-align:center;
-    font-size:30px;
+    font-size:34px;
     font-weight:800;
-    margin-bottom:10px;
+    margin-bottom:12px;
 }
 
-.online{color:#22c55e;}
-.warning{color:#f59e0b;}
-.offline{color:#ef4444;}
+.online{
+    color:var(--green);
+}
 
-.info{
+.warning{
+    color:var(--orange);
+}
+
+.offline{
+    color:var(--red);
+}
+
+.reported{
+    text-align:center;
     background:#eef2f5;
-    color:#111;
     border-radius:12px;
     padding:12px;
-    line-height:1.7;
-    font-size:16px;
+    font-size:22px;
+    color:#111827;
 }
 
 .label{
+    color:var(--blue);
     font-weight:bold;
-    color:#003B5C;
 }
 
 .footer{
     margin-top:15px;
     text-align:center;
     color:#cbd5e1;
-}
-
-#adminBar{
-    display:none;
-    text-align:center;
-    margin-bottom:15px;
-}
-
-#adminBar button{
-    padding:15px 25px;
-    border:none;
-    border-radius:10px;
-    font-size:18px;
-    font-weight:bold;
-    cursor:pointer;
-}
-
-.modal{
-    display:none;
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,.7);
-    justify-content:center;
-    align-items:center;
-    z-index:9999;
-}
-
-.modal-box{
-    background:white;
-    color:black;
-    width:500px;
-    padding:25px;
-    border-radius:20px;
-}
-
-.modal-box h2{
-    margin-bottom:15px;
-}
-
-.modal-box label{
-    display:block;
-    margin-top:10px;
-}
-
-.modal-box input,
-.modal-box select{
-    width:100%;
-    padding:10px;
-    margin-top:5px;
-}
-
-.modal-box button{
-    margin-top:15px;
-    padding:10px 20px;
+    font-size:16px;
 }
 
 </style>
@@ -210,293 +167,213 @@ body{
 <body>
 
 <div class="header">
-    <div class="title" ondblclick="toggleAdmin()">
+    <div class="title">
         KCC SYSTEEMSTATUS
     </div>
 
-    <div class="last-update" id="refreshTime">
+    <div class="refresh" id="refreshTime">
         Laden...
     </div>
 </div>
 
-<div id="adminBar">
-    <button onclick="exportJson()">
-        💾 Exporteer status.json
-    </button>
-</div>
-
-<div id="alertBanner" class="alert-banner"></div>
+<div class="banner" id="banner"></div>
 
 <div class="summary">
 
-    <div class="summary-card" id="onlineCount">
-        🟢 0 Online
+    <div class="summary-card" id="onlineTotal">
+        🟢 0
     </div>
 
-    <div class="summary-card" id="warningCount">
-        🟠 0 Instabiel
+    <div class="summary-card" id="warningTotal">
+        🟠 0
     </div>
 
-    <div class="summary-card" id="offlineCount">
-        🔴 0 Offline
+    <div class="summary-card" id="offlineTotal">
+        🔴 0
     </div>
 
 </div>
 
-<div id="dashboard" class="dashboard"></div>
+<div class="dashboard" id="dashboard"></div>
 
 <div class="footer">
-    Dubbelklik op de titel voor beheermodus
-</div>
-
-<div class="modal" id="editModal">
-
-    <div class="modal-box">
-
-        <h2>Systeem wijzigen</h2>
-
-        <input type="hidden" id="editSystem">
-
-        <label>Status</label>
-        <select id="editStatus">
-            <option value="green">Online</option>
-            <option value="orange">Instabiel</option>
-            <option value="red">Offline</option>
-        </select>
-
-        <label>Gemeld bij</label>
-        <input id="editGemeldBij">
-
-        <label>Door</label>
-        <input id="editDoor">
-
-        <label>Tijdstip melding</label>
-        <input id="editMelding">
-
-        <label>Laatste update</label>
-        <input id="editUpdate">
-
-        <br>
-
-        <button onclick="saveEdit()">Opslaan</button>
-        <button onclick="closeEdit()">Annuleren</button>
-
-    </div>
-
+    Automatische verversing iedere 30 seconden
 </div>
 
 <script>
 
-let adminMode = false;
+function naam(key){
 
-let dashboardData = JSON.parse(
-localStorage.getItem("kccDashboardData")
-) || {
+    if(key === "planner")
+        return "KCC Planner";
 
-internet:{status:"green",gemeldBij:"",door:"",melding:"",update:""},
-nimble:{status:"green",gemeldBij:"",door:"",melding:"",update:""},
-autoline:{status:"green",gemeldBij:"",door:"",melding:"",update:""},
-mobo:{status:"green",gemeldBij:"",door:"",melding:"",update:""},
-planner:{status:"green",gemeldBij:"",door:"",melding:"",update:""},
-awp:{status:"green",gemeldBij:"",door:"",melding:"",update:""}
-
-};
-
-function naam(s){
-
-    if(s==="planner") return "KCC Planner";
-
-    return s.charAt(0).toUpperCase()+s.slice(1);
+    return key.charAt(0).toUpperCase()
+        + key.slice(1);
 }
 
-function toggleAdmin(){
+function statusTekst(status){
 
-    adminMode = !adminMode;
+    if(status === "green")
+        return "ONLINE";
 
-    document.getElementById("adminBar").style.display =
-    adminMode ? "block" : "none";
+    if(status === "orange")
+        return "INSTABIEL";
 
-    if(adminMode){
-        alert("Beheermodus actief");
-    }
+    return "OFFLINE";
 }
 
-function render(){
+function statusClass(status){
 
-    let online=0;
-    let orange=0;
-    let red=0;
+    if(status === "green")
+        return "online";
 
-    let storingen=[];
+    if(status === "orange")
+        return "warning";
 
-    const dashboard =
-    document.getElementById("dashboard");
+    return "offline";
+}
 
-    dashboard.innerHTML="";
+function meldingTekst(type){
 
-    Object.entries(dashboardData).forEach(([key,item])=>{
+    if(type === "it")
+        return "IT";
 
-        if(item.status==="green") online++;
-        if(item.status==="orange") orange++;
-        if(item.status==="red"){
-            red++;
-            storingen.push(naam(key));
+    if(type === "leverancier")
+        return "Leverancier";
+
+    return "Niet gemeld";
+}
+
+async function laadDashboard(){
+
+    try{
+
+        const response =
+            await fetch(
+                "status.json?v=" +
+                Date.now()
+            );
+
+        const data =
+            await response.json();
+
+        const dashboard =
+            document.getElementById(
+                "dashboard"
+            );
+
+        dashboard.innerHTML = "";
+
+        let online = 0;
+        let warning = 0;
+        let offline = 0;
+
+        const offlineSystemen = [];
+
+        Object.entries(data)
+        .forEach(([systeem,item])=>{
+
+            if(item.status === "green")
+                online++;
+
+            if(item.status === "orange")
+                warning++;
+
+            if(item.status === "red"){
+                offline++;
+                offlineSystemen.push(
+                    naam(systeem)
+                );
+            }
+
+            dashboard.innerHTML += `
+            <div class="card">
+
+                <div class="system">
+                    ${naam(systeem)}
+                </div>
+
+                <div class="light ${item.status}">
+                </div>
+
+                <div class="status ${statusClass(item.status)}">
+                    ${statusTekst(item.status)}
+                </div>
+
+                <div class="reported">
+                    <span class="label">
+                        Gemeld bij:
+                    </span><br>
+                    ${meldingTekst(item.melding)}
+                </div>
+
+            </div>
+            `;
+        });
+
+        document.getElementById(
+            "onlineTotal"
+        ).innerHTML =
+        `🟢 ${online}`;
+
+        document.getElementById(
+            "warningTotal"
+        ).innerHTML =
+        `🟠 ${warning}`;
+
+        document.getElementById(
+            "offlineTotal"
+        ).innerHTML =
+        `🔴 ${offline}`;
+
+        const banner =
+            document.getElementById(
+                "banner"
+            );
+
+        if(
+            offlineSystemen.length > 0
+        ){
+
+            banner.style.display =
+                "block";
+
+            banner.innerHTML =
+                "🔴 ACTIEVE STORING: "
+                +
+                offlineSystemen.join(
+                    ", "
+                );
+
+        }else{
+
+            banner.style.display =
+                "none";
         }
 
-        const tekst =
-        item.status==="green"
-        ? "ONLINE"
-        : item.status==="orange"
-        ? "INSTABIEL"
-        : "OFFLINE";
+        document.getElementById(
+            "refreshTime"
+        ).innerHTML =
+        "Laatste controle: "
+        +
+        new Date()
+        .toLocaleString(
+            "nl-NL"
+        );
 
-        const klasse =
-        item.status==="green"
-        ? "online"
-        : item.status==="orange"
-        ? "warning"
-        : "offline";
-
-        dashboard.innerHTML += `
-        <div class="card"
-             onclick="openEditor('${key}')">
-
-            <div class="system">${naam(key)}</div>
-
-            <div class="light ${item.status}"></div>
-
-            <div class="status ${klasse}">
-                ${tekst}
-            </div>
-
-            <div class="info">
-
-                <div><span class="label">Gemeld bij:</span>
-                ${item.gemeldBij || "-"}</div>
-
-                <div><span class="label">Door:</span>
-                ${item.door || "-"}</div>
-
-                <div><span class="label">Melding:</span>
-                ${item.melding || "-"}</div>
-
-                <div><span class="label">Laatste update:</span>
-                ${item.update || "-"}</div>
-
-            </div>
-
-        </div>
-        `;
-    });
-
-    document.getElementById("onlineCount").innerHTML =
-    `🟢 ${online} Online`;
-
-    document.getElementById("warningCount").innerHTML =
-    `🟠 ${orange} Instabiel`;
-
-    document.getElementById("offlineCount").innerHTML =
-    `🔴 ${red} Offline`;
-
-    const banner =
-    document.getElementById("alertBanner");
-
-    if(storingen.length){
-
-        banner.style.display="block";
-        banner.innerHTML =
-        "🔴 ACTIEVE STORING: " +
-        storingen.join(", ");
-
-    }else{
-
-        banner.style.display="none";
     }
+    catch(error){
 
-    document.getElementById("refreshTime").innerHTML =
-    "Laatste controle: " +
-    new Date().toLocaleString("nl-NL");
+        console.error(error);
+    }
 }
 
-function openEditor(system){
+laadDashboard();
 
-    if(!adminMode) return;
-
-    const item = dashboardData[system];
-
-    document.getElementById("editSystem").value = system;
-    document.getElementById("editStatus").value = item.status;
-    document.getElementById("editGemeldBij").value = item.gemeldBij;
-    document.getElementById("editDoor").value = item.door;
-    document.getElementById("editMelding").value = item.melding;
-    document.getElementById("editUpdate").value = item.update;
-
-    document.getElementById("editModal").style.display =
-    "flex";
-}
-
-function closeEdit(){
-
-    document.getElementById("editModal").style.display =
-    "none";
-}
-
-function saveEdit(){
-
-    const s =
-    document.getElementById("editSystem").value;
-
-    dashboardData[s].status =
-    document.getElementById("editStatus").value;
-
-    dashboardData[s].gemeldBij =
-    document.getElementById("editGemeldBij").value;
-
-    dashboardData[s].door =
-    document.getElementById("editDoor").value;
-
-    dashboardData[s].melding =
-    document.getElementById("editMelding").value;
-
-    dashboardData[s].update =
-    document.getElementById("editUpdate").value;
-
-    localStorage.setItem(
-        "kccDashboardData",
-        JSON.stringify(dashboardData)
-    );
-
-    closeEdit();
-    render();
-}
-
-function exportJson(){
-
-    const blob =
-    new Blob(
-        [
-            JSON.stringify(
-                dashboardData,
-                null,
-                2
-            )
-        ],
-        {type:"application/json"}
-    );
-
-    const a =
-    document.createElement("a");
-
-    a.href =
-    URL.createObjectURL(blob);
-
-    a.download =
-    "status.json";
-
-    a.click();
-}
-
-render();
+setInterval(
+    laadDashboard,
+    30000
+);
 
 </script>
 
